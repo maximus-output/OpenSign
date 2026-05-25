@@ -9,19 +9,51 @@ export default async function GetLogoByDomain(request) {
     const res = await tenantCreditsQuery.first({ useMasterKey: true });
     if (res) {
       const updateRes = JSON.parse(JSON.stringify(res));
+      let logoLight = null;
+      let logoDark = null;
+      try {
+        const brandingQuery = new Parse.Query('contracts_OrgBranding');
+        brandingQuery.equalTo('TenantId', {
+          __type: 'Pointer',
+          className: 'partners_Tenant',
+          objectId: res.id,
+        });
+        const branding = await brandingQuery.first({ useMasterKey: true });
+        logoLight = branding?.get('LogoLight')?.url() ?? null;
+        logoDark = branding?.get('LogoDark')?.url() ?? null;
+      } catch (_) {
+        // branding query failed — fall back to nulls
+      }
       return {
         logo: updateRes?.Logo,
         favicon: updateRes?.Favicon || updateRes?.Logo,
         appname: appName,
         user: 'exist',
+        logoLight,
+        logoDark,
       };
     } else {
       const tenantCreditsQuery = new Parse.Query('partners_Tenant');
       const tenantRes = await tenantCreditsQuery.first({ useMasterKey: true });
       if (tenantRes) {
-        return { logo: '', appname: appName, user: 'exist' };
+        let logoLight = null;
+        let logoDark = null;
+        try {
+          const brandingQuery = new Parse.Query('contracts_OrgBranding');
+          brandingQuery.equalTo('TenantId', {
+            __type: 'Pointer',
+            className: 'partners_Tenant',
+            objectId: tenantRes.id,
+          });
+          const branding = await brandingQuery.first({ useMasterKey: true });
+          logoLight = branding?.get('LogoLight')?.url() ?? null;
+          logoDark = branding?.get('LogoDark')?.url() ?? null;
+        } catch (_) {
+          // branding query failed — fall back to nulls
+        }
+        return { logo: '', appname: appName, user: 'exist', logoLight, logoDark };
       } else {
-        return { logo: '', appname: appName, user: 'not_exist' };
+        return { logo: '', appname: appName, user: 'not_exist', logoLight: null, logoDark: null };
       }
     }
   } catch (err) {
