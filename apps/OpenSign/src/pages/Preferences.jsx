@@ -16,7 +16,7 @@ import DateFormatSelector from "../components/preferences/DateFormatSelector";
 import FilenameFormatSelector from "../components/preferences/FilenameFormatSelector";
 import axios from "axios";
 import { withSessionValidation } from "../utils";
-import { WidgetsTab, EmailTab } from "../components/preferences/tabs";
+import { WidgetsTab, EmailTab, OrgBrandingTab } from "../components/preferences/tabs";
 import {
   setUserInfo,
   setTenantInfo,
@@ -76,6 +76,13 @@ const Preferences = () => {
       { name: "widgets", title: t("widgets"), icon: "fa-light fa-list" },
       ...EmailTab,
     ];
+    const extClass = localStorage.getItem("Extand_Class") &&
+      JSON.parse(localStorage.getItem("Extand_Class"));
+    const userRole = extClass?.[0]?.UserRole || "contracts_User";
+    const isAdmin = userRole === "contracts_Admin" || userRole === "contracts_OrgAdmin";
+    if (isAdmin) {
+      arr.push({ name: "branding", title: "Branding", icon: "fa-light fa-palette" });
+    }
     setTab(arr);
     try {
       const user = JSON.parse(
@@ -681,6 +688,7 @@ const Preferences = () => {
                 )}
                 {tabName(activeTab) === "widgets" && <WidgetsTab />}
                 {tabName(activeTab) === "email" && <EmailTab />}
+                {tabName(activeTab) === "branding" && <OrgBrandingTab />}
               </div>
             </div>
           )}

@@ -25,6 +25,8 @@ const Header = ({ isConsole, setIsLoggingOut }) => {
   const image = localStorage.getItem("profileImg") || dp;
   const [isOpen, setIsOpen] = useState(false);
   const [applogo, setAppLogo] = useState("");
+  const [orgLogoLight, setOrgLogoLight] = useState("");
+  const [orgLogoDark, setOrgLogoDark] = useState("");
   const [isDarkTheme, setIsDarkTheme] = useState();
 
   const toggleDropdown = () => {
@@ -58,6 +60,17 @@ const Header = ({ isConsole, setIsLoggingOut }) => {
       } else {
         const logo = localStorage.getItem("appLogo") || appInfo.applogo;
         setAppLogo(logo);
+      }
+      // fetch org-specific branding logos
+      try {
+        const tenantId = localStorage.getItem("TenantId");
+        if (tenantId) {
+          const branding = await Parse.Cloud.run("getorgbranding", { tenantId });
+          if (branding?.logoLight) setOrgLogoLight(branding.logoLight);
+          if (branding?.logoDark) setOrgLogoDark(branding.logoDark);
+        }
+      } catch (_) {
+        // silently fall back to default logo
       }
   }
   const handleLogout = async () => {
@@ -148,9 +161,9 @@ const Header = ({ isConsole, setIsLoggingOut }) => {
               <img
                 className="object-contain h-full w-auto"
                 src={
-                      isDarkTheme
-                      ? "/static/js/assets/images/logo-dark.png"
-                      : applogo
+                  isDarkTheme
+                    ? (orgLogoDark || "/static/js/assets/images/logo-dark.png")
+                    : (orgLogoLight || applogo)
                 }
                 alt="logo"
               />

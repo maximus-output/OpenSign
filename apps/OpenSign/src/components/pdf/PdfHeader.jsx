@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import PrevNext from "./PrevNext";
 import {
   base64ToArrayBuffer,
@@ -6,6 +6,7 @@ import {
   deletePdfPage,
   flattenPdf,
   getFileAsArrayBuffer,
+  getAppLogo,
   handleDownloadCertificate,
   handleDownloadPdf,
   handleRemoveWidgets,
@@ -28,6 +29,27 @@ function Header(props) {
   const [isDeletePage, setIsDeletePage] = useState(false);
   const [isReorderModal, setIsReorderModal] = useState(false);
   const mergePdfInputRef = useRef(null);
+  const [orgLogo, setOrgLogo] = useState("");
+  const [isDarkTheme, setIsDarkTheme] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const branding = await getAppLogo();
+        const dark = document.documentElement.getAttribute("data-theme") === "opensigndark";
+        const url = dark ? (branding?.logoDark || branding?.logoLight) : (branding?.logoLight);
+        if (url) setOrgLogo(url);
+      } catch (_) {}
+    })();
+    // theme observer
+    const updateTheme = () => {
+      setIsDarkTheme(document.documentElement.getAttribute("data-theme") === "opensigndark");
+    };
+    updateTheme();
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    return () => observer.disconnect();
+  }, []);
   const enabledBackBtn = props?.disabledBackBtn === true ? false : true;
   const isViewerSigner = false;
   const finishLabel = t("finish");
@@ -485,6 +507,15 @@ function Header(props) {
             allPages={props?.allPages}
             changePage={props?.changePage}
           />
+          <div className="flex-1 flex justify-center">
+            {orgLogo && (
+              <img
+                src={orgLogo}
+                alt="org logo"
+                className="h-8 object-contain"
+              />
+            )}
+          </div>
           {props?.isPlaceholder ? (
             <>
               <div className="flex mx-[100px] lg:mx-0 order-last lg:order-none"></div>
