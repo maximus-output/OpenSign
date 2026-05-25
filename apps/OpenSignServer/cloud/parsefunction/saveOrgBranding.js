@@ -70,8 +70,11 @@ export default async function saveOrgBranding(request) {
       }
     }
 
-    const saved = await record.save(null, { useMasterKey: true });
-    return JSON.parse(JSON.stringify(saved));
+    const tenantBranding = await record.save(null, { useMasterKey: true });
+    return {
+      logoLight: tenantBranding.get('logoLight')?.url() ?? null,
+      logoDark: tenantBranding.get('logoDark')?.url() ?? null,
+    };
   } catch (err) {
     console.error('err in saveorgbranding', err);
     throw new Parse.Error(err.code || 400, err.message || 'Something went wrong.');

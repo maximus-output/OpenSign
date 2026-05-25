@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
 import Parse from "parse";
 import Alert from "../../../primitives/Alert";
+import { withSessionValidation } from "../../../utils";
 
 const fileToBase64 = (file) =>
   new Promise((resolve, reject) => {
@@ -58,6 +60,9 @@ const LogoSection = ({ label, savedUrl, previewUrl, onFileChange, onRemove, inpu
 };
 
 const OrgBrandingTab = () => {
+  const { tenantInfo } = useSelector((state) => state.user);
+  const tenantId = tenantInfo?.objectId;
+
   const [saved, setSaved] = useState({ light: null, dark: null });
   const [pending, setPending] = useState({ light: null, dark: null });
   const [previews, setPreviews] = useState({ light: null, dark: null });
@@ -68,7 +73,6 @@ const OrgBrandingTab = () => {
   const darkInputRef = useRef(null);
 
   useEffect(() => {
-    const tenantId = localStorage.getItem("TenantId");
     if (!tenantId) return;
 
     Parse.Cloud.run("getorgbranding", { tenantId })
@@ -83,7 +87,14 @@ const OrgBrandingTab = () => {
       .catch((err) => {
         console.error("getorgbranding error:", err);
       });
-  }, []);
+  }, [tenantId]);
+
+  useEffect(() => {
+    return () => {
+      if (previews.light) URL.revokeObjectURL(previews.light);
+      if (previews.dark) URL.revokeObjectURL(previews.dark);
+    };
+  }, [previews.light, previews.dark]);
 
   const showAlert = (type, msg) => {
     setAlert({ type, msg });
@@ -109,8 +120,7 @@ const OrgBrandingTab = () => {
     setSaved((prev) => ({ ...prev, [slot]: null }));
   };
 
-  const handleSave = async () => {
-    const tenantId = localStorage.getItem("TenantId");
+  const handleSave = withSessionValidation(async () => {
     if (!tenantId) return;
 
     setIsSaving(true);
