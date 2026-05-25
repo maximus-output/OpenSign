@@ -25,42 +25,49 @@ const EmailBodyEditor = ({
     }
   }, [isReset]);
 
-  const initProcessContent = () => {
-    // 1. Sanitize immediately to strip scripts/malicious tags
-    const sanitized = DOMPurify.sanitize(value, {
-      USE_PROFILES: { html: true }, // Ensures basic HTML structure
-      ADD_ATTR: ["target"] // Allow links to open in new tabs
+  const sanitizeHtml = (raw) =>
+    DOMPurify.sanitize(raw, {
+      USE_PROFILES: { html: true },
+      ADD_ATTR: [
+        "target",
+        "width", "height", "bgcolor",
+        "align", "valign",
+        "cellpadding", "cellspacing", "border"
+      ],
+      ADD_TAGS: ["table", "tr", "td", "th", "thead", "tbody", "tfoot"],
+      FORCE_BODY: true,
+      WHOLE_DOCUMENT: true
     });
 
-    // 2. Inline CSS for email compatibility
-    // Note: Juice is fast, but for huge files, you might debounce this
+  const inlineStyles = (sanitized) =>
+    juice(sanitized, {
+      removeStyleTags: false,
+      preserveMediaQueries: true,
+      preserveFontFaces: true
+    });
+
+  const initProcessContent = () => {
+    const sanitized = sanitizeHtml(value);
     try {
-      const inlined = juice(sanitized);
+      const inlined = inlineStyles(sanitized);
       setInputHtml(inlined);
       onChange?.(inlined);
       setCleanPreview(inlined);
     } catch (err) {
       onChange?.(sanitized);
-      setInputHtml(sanitized); // Fallback if juice fails
+      setInputHtml(sanitized);
       setCleanPreview(sanitized);
     }
   };
 
   const processContent = (value) => {
-    // 1. Sanitize immediately to strip scripts/malicious tags
-    const sanitized = DOMPurify.sanitize(value, {
-      USE_PROFILES: { html: true }, // Ensures basic HTML structure
-      ADD_ATTR: ["target"] // Allow links to open in new tabs
-    });
-
-    // 2. Inline CSS for email compatibility
-    // Note: Juice is fast, but for huge files, you might debounce this
+    const sanitized = sanitizeHtml(value);
     try {
-      const inlined = juice(sanitized);
+      const inlined = inlineStyles(sanitized);
       setCleanPreview(inlined);
       onChange?.(inlined);
     } catch (err) {
-      setCleanPreview(sanitized); // Fallback if juice fails
+      setCleanPreview(sanitized);
       onChange?.(sanitized);
     }
   };
