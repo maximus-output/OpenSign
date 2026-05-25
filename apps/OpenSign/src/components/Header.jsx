@@ -54,24 +54,15 @@ const Header = ({ isConsole, setIsLoggingOut }) => {
 
 
   async function initializeHead() {
-      const applogo = await getAppLogo();
-      if (applogo?.logo) {
-        setAppLogo(applogo?.logo);
-      } else {
-        const logo = localStorage.getItem("appLogo") || appInfo.applogo;
-        setAppLogo(logo);
-      }
-      // fetch org-specific branding logos
-      try {
-        const tenantId = localStorage.getItem("TenantId");
-        if (tenantId) {
-          const branding = await Parse.Cloud.run("getorgbranding", { tenantId });
-          if (branding?.logoLight) setOrgLogoLight(branding.logoLight);
-          if (branding?.logoDark) setOrgLogoDark(branding.logoDark);
-        }
-      } catch (_) {
-        // silently fall back to default logo
-      }
+    const applogo = await getAppLogo();
+    if (applogo?.logo) {
+      setAppLogo(applogo?.logo);
+    } else {
+      const logo = localStorage.getItem("appLogo") || appInfo.applogo;
+      setAppLogo(logo);
+    }
+    if (applogo?.logoLight) setOrgLogoLight(applogo.logoLight);
+    if (applogo?.logoDark) setOrgLogoDark(applogo.logoDark);
   }
   const handleLogout = async () => {
     setIsOpen(false);

@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import Parse from "parse";
 import Alert from "../../../primitives/Alert";
 import { withSessionValidation } from "../../../utils";
+import { useTranslation } from "react-i18next";
 
 const fileToBase64 = (file) =>
   new Promise((resolve, reject) => {
@@ -12,7 +13,7 @@ const fileToBase64 = (file) =>
     reader.readAsDataURL(file);
   });
 
-const LogoSection = ({ label, savedUrl, previewUrl, onFileChange, onRemove, inputRef }) => {
+const LogoSection = ({ label, savedUrl, previewUrl, onFileChange, onRemove, inputRef, t }) => {
   const hasLogo = savedUrl || previewUrl;
 
   return (
@@ -42,7 +43,7 @@ const LogoSection = ({ label, savedUrl, previewUrl, onFileChange, onRemove, inpu
           className="op-btn op-btn-ghost op-btn-sm"
           onClick={() => inputRef.current?.click()}
         >
-          Choose file
+          {t("choose-file")}
         </button>
 
         {hasLogo && (
@@ -51,7 +52,7 @@ const LogoSection = ({ label, savedUrl, previewUrl, onFileChange, onRemove, inpu
             className="op-btn op-btn-ghost op-btn-sm text-error"
             onClick={onRemove}
           >
-            Remove
+            {t("remove")}
           </button>
         )}
       </div>
@@ -60,6 +61,7 @@ const LogoSection = ({ label, savedUrl, previewUrl, onFileChange, onRemove, inpu
 };
 
 const OrgBrandingTab = () => {
+  const { t } = useTranslation();
   const { tenantInfo } = useSelector((state) => state.user);
   const tenantId = tenantInfo?.objectId;
 
@@ -158,10 +160,10 @@ const OrgBrandingTab = () => {
       if (previews.dark) URL.revokeObjectURL(previews.dark);
       setPreviews({ light: null, dark: null });
 
-      showAlert("success", "Branding saved successfully.");
+      showAlert("success", t("saved-successfully"));
     } catch (err) {
       console.error("saveorgbranding error:", err);
-      showAlert("danger", err.message || "Failed to save branding.");
+      showAlert("danger", err.message || t("failed-to-save-branding"));
     } finally {
       setIsSaving(false);
     }
@@ -173,20 +175,22 @@ const OrgBrandingTab = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <LogoSection
-          label="Light mode logo"
+          label={t("light-mode-logo")}
           savedUrl={saved.light}
           previewUrl={previews.light}
           onFileChange={handleFileChange("light")}
           onRemove={handleRemove("light")}
           inputRef={lightInputRef}
+          t={t}
         />
         <LogoSection
-          label="Dark mode logo"
+          label={t("dark-mode-logo")}
           savedUrl={saved.dark}
           previewUrl={previews.dark}
           onFileChange={handleFileChange("dark")}
           onRemove={handleRemove("dark")}
           inputRef={darkInputRef}
+          t={t}
         />
       </div>
 
@@ -197,7 +201,7 @@ const OrgBrandingTab = () => {
           onClick={handleSave}
           disabled={isSaving}
         >
-          {isSaving ? "Saving..." : "Save"}
+          {isSaving ? "..." : t("save")}
         </button>
       </div>
     </div>
