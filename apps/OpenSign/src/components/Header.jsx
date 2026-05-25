@@ -162,7 +162,7 @@ const Header = ({ isConsole, setIsLoggingOut }) => {
                 className="object-contain h-full w-auto"
                 src={
                   isDarkTheme
-                    ? (orgLogoDark || "/static/js/assets/images/logo-dark.png")
+                    ? (orgLogoDark || orgLogoLight || applogo)
                     : (orgLogoLight || applogo)
                 }
                 alt="logo"

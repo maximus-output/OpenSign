@@ -2738,7 +2738,9 @@ export const getAppLogo = async () => {
       return {
         logo: tenant?.logo,
         favicon: resolvedFavicon,
-        user: tenant?.user
+        user: tenant?.user,
+        logoLight: tenant?.logoLight ?? null,
+        logoDark: tenant?.logoDark ?? null,
       };
     }
   } catch (err) {

@@ -81,7 +81,7 @@ const Preferences = () => {
     const userRole = extClass?.[0]?.UserRole || "contracts_User";
     const isAdmin = userRole === "contracts_Admin" || userRole === "contracts_OrgAdmin";
     if (isAdmin) {
-      arr.push({ name: "branding", title: "Branding", icon: "fa-light fa-palette" });
+      arr.push({ name: "branding", title: t("branding"), icon: "fa-light fa-palette" });
     }
     setTab(arr);
     try {
