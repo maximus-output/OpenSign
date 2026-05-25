@@ -1,4 +1,5 @@
 import EmailTab from "./Email";
+import OrgBrandingTab from "./Branding";
 import WidgetsTab from "./Widgets";
 
-export { EmailTab, WidgetsTab };
+export { EmailTab, OrgBrandingTab, WidgetsTab };
