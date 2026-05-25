@@ -119,15 +119,16 @@ const MailTemplateEditor = ({
     updatedInfo.EmailEditorType = response?.EmailEditorType;
     dispatch(action(updatedInfo));
   };
+  const buildHtmlBody = (body, type) => {
+    if (type === "advanced") return body; // EmailBodyEditor already returns a full document
+    return `<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body>${body}</body></html>`;
+  };
+
   //function to save completion email template
   const handleSaveCompletionEmail = withSessionValidation(async (e) => {
     e.preventDefault();
     try {
-      const replacedHtmlBody = completionBody[editorType.completion]?.replace(
-        /"/g,
-        "'"
-      );
-      const htmlBody = `<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body>${replacedHtmlBody}</body></html>`;
+      const htmlBody = buildHtmlBody(completionBody[editorType.completion], editorType.completion);
       const updateTenant = await Parse.Cloud.run(cloudfunction, {
         tenantId: tenantId,
         details: {
@@ -159,12 +160,7 @@ const MailTemplateEditor = ({
   const handleSaveRequestEmail = withSessionValidation(async (e) => {
     e.preventDefault();
     try {
-      const replacedHtmlBody = requestBody[editorType.request]?.replace(
-        /"/g,
-        "'"
-      );
-
-      const htmlBody = `<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body>${replacedHtmlBody}</body></html>`;
+      const htmlBody = buildHtmlBody(requestBody[editorType.request], editorType.request);
       const updateTenant = await Parse.Cloud.run(cloudfunction, {
         tenantId: tenantId,
         details: {

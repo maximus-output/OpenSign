@@ -17,23 +17,7 @@ export const subSetting = [
     description: "",
     objectId: "preferences"
   },
-  ...userssetting,
-  {
-    icon: "fa-light fa-key",
-    title: "API Token",
-    target: "_self",
-    pageType: "",
-    description: "",
-    objectId: "generatetoken"
-  },
-  {
-    icon: "fa-light fa-globe",
-    title: "Webhook",
-    target: "_self",
-    pageType: "",
-    description: "",
-    objectId: "webhook"
-  }
+  ...userssetting
 ];
 
 const sidebarList = [
