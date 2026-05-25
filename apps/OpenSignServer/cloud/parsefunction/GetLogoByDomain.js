@@ -19,8 +19,8 @@ export default async function GetLogoByDomain(request) {
           objectId: res.id,
         });
         const branding = await brandingQuery.first({ useMasterKey: true });
-        logoLight = branding?.get('LogoLight')?.url() ?? null;
-        logoDark = branding?.get('LogoDark')?.url() ?? null;
+        logoLight = branding?.get('logoLight')?.url() ?? null;
+        logoDark = branding?.get('logoDark')?.url() ?? null;
       } catch (_) {
         // branding query failed — fall back to nulls
       }
@@ -46,8 +46,8 @@ export default async function GetLogoByDomain(request) {
             objectId: tenantRes.id,
           });
           const branding = await brandingQuery.first({ useMasterKey: true });
-          logoLight = branding?.get('LogoLight')?.url() ?? null;
-          logoDark = branding?.get('LogoDark')?.url() ?? null;
+          logoLight = branding?.get('logoLight')?.url() ?? null;
+          logoDark = branding?.get('logoDark')?.url() ?? null;
         } catch (_) {
           // branding query failed — fall back to nulls
         }
