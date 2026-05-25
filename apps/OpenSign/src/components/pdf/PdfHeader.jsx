@@ -29,16 +29,16 @@ function Header(props) {
   const [isDeletePage, setIsDeletePage] = useState(false);
   const [isReorderModal, setIsReorderModal] = useState(false);
   const mergePdfInputRef = useRef(null);
-  const [orgLogo, setOrgLogo] = useState("");
+  const [orgLogoLight, setOrgLogoLight] = useState("");
+  const [orgLogoDark, setOrgLogoDark] = useState("");
   const [isDarkTheme, setIsDarkTheme] = useState(false);
 
   useEffect(() => {
     (async () => {
       try {
         const branding = await getAppLogo();
-        const dark = document.documentElement.getAttribute("data-theme") === "opensigndark";
-        const url = dark ? (branding?.logoDark || branding?.logoLight) : (branding?.logoLight);
-        if (url) setOrgLogo(url);
+        if (branding?.logoLight) setOrgLogoLight(branding.logoLight);
+        if (branding?.logoDark) setOrgLogoDark(branding.logoDark);
       } catch (_) {}
     })();
     // theme observer
@@ -50,6 +50,11 @@ function Header(props) {
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
     return () => observer.disconnect();
   }, []);
+
+  // Derived — recalculated on every render when isDarkTheme changes
+  const orgLogo = isDarkTheme
+    ? (orgLogoDark || orgLogoLight)
+    : orgLogoLight;
   const enabledBackBtn = props?.disabledBackBtn === true ? false : true;
   const isViewerSigner = false;
   const finishLabel = t("finish");
