@@ -9,12 +9,16 @@ export default async function getOrgBranding(request) {
     throw new Parse.Error(Parse.Error.INVALID_QUERY, 'Missing tenantId.');
   }
 
+  // Verify caller belongs to this tenant (no role requirement for reads)
+  const userQuery = new Parse.Query('contracts_Users');
+  userQuery.equalTo('UserId', request.user);
+  const extUser = await userQuery.first({ useMasterKey: true });
+  if (!extUser || extUser.get('TenantId')?.id !== tenantId) {
+    throw new Parse.Error(Parse.Error.INVALID_SESSION_TOKEN, 'unauthorized');
+  }
+
   try {
-    const tenantPointer = Parse.Object.fromJSON({
-      __type: 'Pointer',
-      className: 'partners_Tenant',
-      objectId: tenantId,
-    });
+    const tenantPointer = { __type: 'Pointer', className: 'partners_Tenant', objectId: tenantId };
 
     const query = new Parse.Query('contracts_OrgBranding');
     query.equalTo('TenantId', tenantPointer);
@@ -32,6 +36,7 @@ export default async function getOrgBranding(request) {
       logoDark: logoDarkFile ? logoDarkFile.url() : null,
     };
   } catch (err) {
+    console.error('err in getorgbranding', err);
     const code = err.code || 400;
     const msg = err.message || 'Something went wrong.';
     throw new Parse.Error(code, msg);
