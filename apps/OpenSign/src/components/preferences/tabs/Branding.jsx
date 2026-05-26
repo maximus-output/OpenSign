@@ -167,7 +167,7 @@ const OrgBrandingTab = () => {
     } finally {
       setIsSaving(false);
     }
-  };
+  });
 
   return (
     <div id="panel-branding">
