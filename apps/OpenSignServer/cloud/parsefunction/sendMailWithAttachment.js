@@ -133,9 +133,10 @@ async function sendMailProvider(params) {
           }
           const from = params.from || '';
           const mailsender = smtpenable ? process.env.SMTP_USER_EMAIL : process.env.MAILGUN_SENDER;
+          const smtpMailFrom = smtpenable && process.env.SMTP_MAIL_FROM;
           const replyto = params?.replyto || '';
           const messageParams = {
-            from: from + ' <' + mailsender + '>',
+            from: smtpMailFrom || (from + ' <' + mailsender + '>'),
             to: params.recipient,
             subject: params.subject,
             text: params.text || 'mail',
@@ -186,9 +187,10 @@ async function sendMailProvider(params) {
     } else {
       const from = params.from || '';
       const mailsender = smtpenable ? process.env.SMTP_USER_EMAIL : process.env.MAILGUN_SENDER;
+      const smtpMailFrom = smtpenable && process.env.SMTP_MAIL_FROM;
       const replyto = params?.replyto || '';
       const messageParams = {
-        from: from + ' <' + mailsender + '>',
+        from: smtpMailFrom || (from + ' <' + mailsender + '>'),
         to: params.recipient,
         subject: params.subject,
         text: params.text || 'mail',

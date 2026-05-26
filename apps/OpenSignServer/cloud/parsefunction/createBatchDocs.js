@@ -140,11 +140,11 @@ async function sendMail(document, publicUrl) {
       let mailSubject = senderObj?.TenantId?.RequestSubject || '';
       let replaceVar;
       if (mailBody && mailSubject) {
-        const replacedRequestBody = mailBody.replace(/"/g, "'");
-        const htmlReqBody =
-          "<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body>" +
-          replacedRequestBody +
-          '</body></html>';
+        const htmlReqBody = mailBody.trim().toLowerCase().startsWith('<html')
+          ? mailBody
+          : "<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body>" +
+            mailBody +
+            '</body></html>';
         const variables = {
           document_title: document?.Name,
           note: document?.Note || '',

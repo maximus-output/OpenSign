@@ -235,8 +235,8 @@ async function sendCompletedMail(obj) {
           const tenantRes = await tenantQuery.first({ useMasterKey: true });
           if (tenantRes) {
             const _tenantRes = JSON.parse(JSON.stringify(tenantRes));
-            subject = _tenantRes?.CompletionSubject ? tenant?.CompletionSubject : subject;
-            body = _tenantRes?.CompletionBody ? tenant?.CompletionBody : body;
+            subject = _tenantRes?.CompletionSubject ? _tenantRes.CompletionSubject : subject;
+            body = _tenantRes?.CompletionBody ? _tenantRes.CompletionBody : body;
           }
         } catch (err) {
           console.log('error in fetch tenant in signpdf', err.message);

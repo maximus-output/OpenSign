@@ -40,9 +40,10 @@ async function sendMailProvider(req) {
 
     const from = req.params.from || '';
     const mailsender = smtpenable ? process.env.SMTP_USER_EMAIL : process.env.MAILGUN_SENDER;
+    const smtpMailFrom = smtpenable && process.env.SMTP_MAIL_FROM;
     const replyto = req.params?.replyto || '';
     const messageParams = {
-      from: from + ' <' + mailsender + '>',
+      from: smtpMailFrom || (from + ' <' + mailsender + '>'),
       to: req.params.recipient,
       subject: req.params.subject,
       text: req.params.text || 'mail',

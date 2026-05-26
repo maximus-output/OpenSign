@@ -4541,12 +4541,13 @@ export const sendEmailToSigners = async (
       const documentName = `${pdfDetails?.[0].Name}`;
       let replaceVar;
 
+      const wrapBodyIfNeeded = (body) => {
+        if (body.trim().toLowerCase().startsWith("<html")) return body;
+        return `<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body>${body}</body></html>`;
+      };
+
       if (customizeMail && isCustomize) {
-        const replacedRequestBody = customizeMail?.body.replace(/"/g, "'");
-        htmlReqBody =
-          "<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body>" +
-          replacedRequestBody +
-          "</body> </html>";
+        htmlReqBody = wrapBodyIfNeeded(customizeMail?.body);
 
         const variables = {
           document_title: documentName,
@@ -4569,11 +4570,7 @@ export const sendEmailToSigners = async (
       } else if (defaultMail?.body && defaultMail?.subject) {
         const mailBody = defaultMail?.body;
         const mailSubject = defaultMail.subject;
-        const replacedRequestBody = mailBody.replace(/"/g, "'");
-        const htmlReqBody =
-          "<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body>" +
-          replacedRequestBody +
-          "</body> </html>";
+        const htmlReqBody = wrapBodyIfNeeded(mailBody);
         const variables = {
           document_title: documentName,
           note: pdfDetails?.[0]?.Note,
