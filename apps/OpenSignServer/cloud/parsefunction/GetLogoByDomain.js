@@ -1,4 +1,10 @@
 import { appName } from '../../Utils.js';
+import { getSignedLocalUrl } from './getSignedUrl.js';
+
+function signLogoUrl(url) {
+  if (!url) return null;
+  return url.includes('/files/') ? getSignedLocalUrl(url, 86400) : url;
+}
 
 // `GetLogoByDomain` is used to get logo by domain as well as check any tenant exist or not in db
 export default async function GetLogoByDomain(request) {
@@ -19,8 +25,8 @@ export default async function GetLogoByDomain(request) {
           objectId: res.id,
         });
         const branding = await brandingQuery.first({ useMasterKey: true });
-        logoLight = branding?.get('logoLight')?.url() ?? null;
-        logoDark = branding?.get('logoDark')?.url() ?? null;
+        logoLight = signLogoUrl(branding?.get('logoLight')?.url() ?? null);
+        logoDark = signLogoUrl(branding?.get('logoDark')?.url() ?? null);
       } catch (_) {
         // branding query failed — fall back to nulls
       }
@@ -46,8 +52,8 @@ export default async function GetLogoByDomain(request) {
             objectId: tenantRes.id,
           });
           const branding = await brandingQuery.first({ useMasterKey: true });
-          logoLight = branding?.get('logoLight')?.url() ?? null;
-          logoDark = branding?.get('logoDark')?.url() ?? null;
+          logoLight = signLogoUrl(branding?.get('logoLight')?.url() ?? null);
+          logoDark = signLogoUrl(branding?.get('logoDark')?.url() ?? null);
         } catch (_) {
           // branding query failed — fall back to nulls
         }

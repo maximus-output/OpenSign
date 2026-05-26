@@ -1,3 +1,10 @@
+import { getSignedLocalUrl } from './getSignedUrl.js';
+
+function signLogoUrl(url) {
+  if (!url) return null;
+  return url.includes('/files/') ? getSignedLocalUrl(url, 86400) : url;
+}
+
 export default async function getOrgBranding(request) {
   if (!request.user) {
     throw new Parse.Error(Parse.Error.INVALID_SESSION_TOKEN, 'unauthorized');
@@ -32,8 +39,8 @@ export default async function getOrgBranding(request) {
     const logoDarkFile = record.get('logoDark');
 
     return {
-      logoLight: logoLightFile ? logoLightFile.url() : null,
-      logoDark: logoDarkFile ? logoDarkFile.url() : null,
+      logoLight: signLogoUrl(logoLightFile?.url()),
+      logoDark: signLogoUrl(logoDarkFile?.url()),
     };
   } catch (err) {
     console.error('err in getorgbranding', err);

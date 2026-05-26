@@ -1,5 +1,13 @@
+import { getSignedLocalUrl } from './getSignedUrl.js';
+
 const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/svg+xml', 'image/webp'];
 const ALLOWED_EXT = /\.(png|jpe?g|gif|svg|webp)$/i;
+
+// Logos are public branding assets — sign with a long-lived token (24 h).
+function signLogoUrl(url) {
+  if (!url) return null;
+  return url.includes('/files/') ? getSignedLocalUrl(url, 86400) : url;
+}
 
 function validateLogoField(logo, fieldName) {
   if (!logo.base64 || !logo.contentType || !logo.name) {
@@ -72,8 +80,8 @@ export default async function saveOrgBranding(request) {
 
     const tenantBranding = await record.save(null, { useMasterKey: true });
     return {
-      logoLight: tenantBranding.get('logoLight')?.url() ?? null,
-      logoDark: tenantBranding.get('logoDark')?.url() ?? null,
+      logoLight: signLogoUrl(tenantBranding.get('logoLight')?.url()),
+      logoDark: signLogoUrl(tenantBranding.get('logoDark')?.url()),
     };
   } catch (err) {
     console.error('err in saveorgbranding', err);
