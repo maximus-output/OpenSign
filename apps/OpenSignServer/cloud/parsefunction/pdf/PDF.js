@@ -18,6 +18,7 @@ import { P12Signer } from '@signpdf/signer-p12';
 import { buildDownloadFilename, parseUploadFile } from '../../../utils/fileUtils.js';
 import sendMailWithAttachment from '../sendMailWithAttachment.js';
 import sendSystemMail from '../sendSystemMail.js';
+import { getSignedLocalUrl } from '../getSignedUrl.js';
 import {
   COMPLETION_ACTIVITIES,
   findPlaceholderIndex,
@@ -305,7 +306,27 @@ async function sendCompletedMail(obj) {
 
 // `sendMailsaveCertifcate` is used send completion mail and update complete status of document
 async function sendMailsaveCertifcate(doc, pfx, isCustomMail, mailProvider, filename) {
-  const certificate = await GenerateCertificate(doc);
+  // Fetch org logo for the certificate (fall back to default if unavailable)
+  let orgLogoUrl = null;
+  try {
+    const tenantId = doc?.ExtUserPtr?.TenantId?.objectId;
+    if (tenantId) {
+      const brandingQuery = new Parse.Query('contracts_OrgBranding');
+      brandingQuery.equalTo('TenantId', {
+        __type: 'Pointer',
+        className: 'partners_Tenant',
+        objectId: tenantId,
+      });
+      const branding = await brandingQuery.first({ useMasterKey: true });
+      const rawUrl = branding?.get('logoLight')?.url() ?? branding?.get('logoDark')?.url();
+      if (rawUrl) {
+        orgLogoUrl = rawUrl.includes('/files/') ? getSignedLocalUrl(rawUrl, 300) : rawUrl;
+      }
+    }
+  } catch (_) {
+    // branding unavailable — certificate will use default logo
+  }
+  const certificate = await GenerateCertificate({ ...doc, orgLogoUrl });
   const certificatePdf = await PDFDocument.load(certificate);
   const P12Buffer = fs.readFileSync(pfx.name);
   const p12 = new P12Signer(P12Buffer, { passphrase: pfx.passphrase || null });

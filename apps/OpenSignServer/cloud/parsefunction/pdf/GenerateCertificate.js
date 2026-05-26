@@ -2,6 +2,7 @@ import { PDFDocument, rgb } from 'pdf-lib';
 import fs from 'node:fs';
 import fontkit from '@pdf-lib/fontkit';
 import { formatDateTime } from '../../../Utils.js';
+import axios from 'axios';
 
 const formatDateStr = (dateStr, DateFormat, timezone, Is12Hr) => {
   if (!dateStr) return '';
@@ -19,10 +20,26 @@ export default async function GenerateCertificate(docDetails) {
   const fontBytes = fs.readFileSync('./font/times.ttf'); //
   pdfDoc.registerFontkit(fontkit);
   const timesRomanFont = await pdfDoc.embedFont(fontBytes, { subset: true });
-  const pngUrl = fs.readFileSync('./images/logo.png').buffer;
+  const defaultLogoBytes = fs.readFileSync('./images/logo.png').buffer;
   const naSignUrl = fs.readFileSync('./images/na_sign.png').buffer;
   const nasign = await pdfDoc.embedPng(naSignUrl);
-  const pngImage = await pdfDoc.embedPng(pngUrl);
+
+  let pngImage;
+  const orgLogoUrl = docDetails?.orgLogoUrl;
+  if (orgLogoUrl) {
+    try {
+      const res = await axios.get(orgLogoUrl, { responseType: 'arraybuffer', timeout: 5000 });
+      const logoData = Buffer.from(res.data);
+      const cleanUrl = orgLogoUrl.split('?')[0];
+      pngImage = /\.(jpe?g)$/i.test(cleanUrl)
+        ? await pdfDoc.embedJpg(logoData)
+        : await pdfDoc.embedPng(logoData);
+    } catch (_) {
+      pngImage = await pdfDoc.embedPng(defaultLogoBytes);
+    }
+  } else {
+    pngImage = await pdfDoc.embedPng(defaultLogoBytes);
+  }
   const page = pdfDoc.addPage();
   const { width, height } = page.getSize();
   const startX = 15;

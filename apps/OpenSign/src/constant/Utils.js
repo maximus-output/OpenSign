@@ -4522,7 +4522,8 @@ export const sendEmailToSigners = async (
       const encodeBase64 = btoa(
         `${pdfDetails[0]?.objectId}/${signerMail[i].Email}/${objectId}`
       );
-      let signPdf = `${hostUrl}/login/${encodeBase64}`;
+      const signPath = `/login/${encodeBase64}`;
+      let signPdf = `${hostUrl}${signPath}`;
       const orgName = pdfDetails[0]?.ExtUserPtr.Company
         ? pdfDetails[0].ExtUserPtr.Company
         : "";
@@ -4560,7 +4561,8 @@ export const sendEmailToSigners = async (
           receiver_phone: signerMail[i]?.Phone || "",
           expiry_date: localExpireDate,
           company_name: orgName,
-          signing_url: signPdf
+          signing_url: signPdf,
+          signing_path: signPath
         };
         replaceVar = replaceMailVaribles(
           customizeMail.subject,
@@ -4582,7 +4584,8 @@ export const sendEmailToSigners = async (
           receiver_phone: signerMail[i]?.Phone || "",
           expiry_date: localExpireDate,
           company_name: orgName,
-          signing_url: signPdf
+          signing_url: signPdf,
+          signing_path: signPath
         };
         replaceVar = replaceMailVaribles(mailSubject, htmlReqBody, variables);
       }
