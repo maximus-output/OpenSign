@@ -52,11 +52,15 @@ export function replaceMailVaribles(subject, body, variables) {
 
   for (const variable in variables) {
     const regex = new RegExp(`{{${variable}}}`, 'g');
+    // Also match the URL-encoded form that browsers produce when {{ }} appear inside href attributes
+    const encodedRegex = new RegExp(`%7B%7B${variable}%7D%7D`, 'gi');
     if (subject) {
       replacedSubject = replacedSubject.replace(regex, variables[variable]);
+      replacedSubject = replacedSubject.replace(encodedRegex, variables[variable]);
     }
     if (body) {
       replacedBody = replacedBody.replace(regex, variables[variable]);
+      replacedBody = replacedBody.replace(encodedRegex, variables[variable]);
     }
   }
   const result = { subject: replacedSubject, body: replacedBody };

@@ -133,8 +133,8 @@ async function sendMail(document, publicUrl) {
       } else {
         encodeBase64 = toBase64(`${document.objectId}/${signerMail[i].email}`);
       }
-      const signPath = `/login/${encodeBase64}`;
-      let signPdf = `${hostUrl}${signPath}`;
+      const signPath = `login/${encodeBase64}`;
+      let signPdf = `${hostUrl}/${signPath}`;
       const orgName = document.ExtUserPtr.Company ? document.ExtUserPtr.Company : '';
       const senderObj = document?.ExtUserPtr;
       let mailBody = senderObj?.TenantId?.RequestBody || '';
