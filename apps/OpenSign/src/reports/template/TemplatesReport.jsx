@@ -574,7 +574,8 @@ const TemplatesReport = (props) => {
       month: "long",
       year: "numeric"
     });
-    const signPdf = `${window.location.origin}/login/${encodeBase64}`;
+    const signPath = `login/${encodeBase64}`;
+    const signPdf = `${window.location.origin}/${signPath}`;
     const variables = {
       document_title: doc.Name,
       note: doc?.Note || "",
@@ -588,7 +589,8 @@ const TemplatesReport = (props) => {
       receiver_phone: userDetails?.Phone || "",
       expiry_date: localExpireDate,
       company_name: doc.ExtUserPtr.Company,
-      signing_url: signPdf
+      signing_url: signPdf,
+      signing_path: signPath
     };
     const res = replaceMailVaribles(subject, "", variables);
     setMail((prev) => ({ ...prev, subject: res.subject }));
@@ -605,7 +607,8 @@ const TemplatesReport = (props) => {
       month: "long",
       year: "numeric"
     });
-    const signPdf = `${window.location.origin}/login/${encodeBase64}`;
+    const signPath = `login/${encodeBase64}`;
+    const signPdf = `${window.location.origin}/${signPath}`;
     const variables = {
       document_title: doc.Name,
       note: doc?.Note || "",
@@ -619,7 +622,8 @@ const TemplatesReport = (props) => {
       receiver_phone: userDetails?.Phone || "",
       expiry_date: localExpireDate,
       company_name: doc.ExtUserPtr.Company,
-      signing_url: signPdf
+      signing_url: signPdf,
+      signing_path: signPath
     };
     const res = replaceMailVaribles("", body, variables);
 
@@ -652,7 +656,8 @@ const TemplatesReport = (props) => {
       month: "long",
       year: "numeric"
     });
-    const signPdf = `${window.location.origin}/login/${encodeBase64}`;
+    const signPath = `login/${encodeBase64}`;
+    const signPdf = `${window.location.origin}/${signPath}`;
     const variables = {
       document_title: doc.Name,
       note: doc?.Note || "",
@@ -666,7 +671,8 @@ const TemplatesReport = (props) => {
       receiver_phone: user?.signerPtr?.Phone || "",
       expiry_date: localExpireDate,
       company_name: doc?.ExtUserPtr?.Company || "",
-      signing_url: signPdf
+      signing_url: signPdf,
+      signing_path: signPath
     };
     const subject =
       doc?.RequestSubject ||

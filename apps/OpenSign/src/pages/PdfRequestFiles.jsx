@@ -863,8 +863,8 @@ function PdfRequestFiles(
                         } else {
                           encodeBase64 = btoa(`${docId}/${user.Email}`);
                         }
-                        let signPdf =
-                              `${hostUrl}/login/${encodeBase64}`;
+                        const signPath = `login/${encodeBase64}`;
+                        let signPdf = `${hostUrl}/${signPath}`;
                         const orgName = pdfDetails[0]?.ExtUserPtr.Company
                           ? pdfDetails[0].ExtUserPtr.Company
                           : "";
@@ -873,14 +873,11 @@ function PdfRequestFiles(
                           requestBody &&
                           requestSubject
                         ) {
-                          const replacedRequestBody = requestBody.replace(
-                            /"/g,
-                            "'"
-                          );
-                          const htmlReqBody =
-                            "<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body>" +
-                            replacedRequestBody +
-                            "</body></html>";
+                          const htmlReqBody = requestBody.trim().toLowerCase().startsWith("<html")
+                            ? requestBody
+                            : "<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body>" +
+                              requestBody +
+                              "</body></html>";
 
                           const variables = {
                             document_title: documentName,
@@ -893,7 +890,8 @@ function PdfRequestFiles(
                             receiver_phone: user?.Phone || "",
                             expiry_date: localExpireDate,
                             company_name: orgName,
-                            signing_url: signPdf
+                            signing_url: signPdf,
+                            signing_path: signPath
                           };
                           replaceVar = replaceMailVaribles(
                             requestSubject,
